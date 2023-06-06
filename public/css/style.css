@@ -160,7 +160,6 @@ body {
     float: right;
 }
 
-/* login screen */
 .login-page-box {
     display: table;
     width: 100%;
@@ -195,6 +194,10 @@ body {
     box-sizing: border-box; /* modern way to say width:100% without padding */
     /*text-transform: uppercase;*/
 }
+.login-box input[type="file"] {
+    display: none;
+}
+.login-box-file,
 .login-box input[type="submit"] {
     color: #777;
     background-color: transparent;
@@ -206,7 +209,24 @@ body {
     box-sizing: border-box; /* modern way to say width:100% without padding */
     text-transform: uppercase;
 }
+.login-box input[type="button"] {
+    color: #777;
+    background-color: transparent;
+    border: 2px solid #777;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    display: block;
+    width: 100%;
+    box-sizing: border-box; /* modern way to say width:100% without padding */
+    text-transform: uppercase;
+}
+.login-box-file:hover,
 .login-box input[type="submit"]:hover {
+    color: #fff;
+    border-color: #252525;
+    background-color: #252525;
+}
+.login-box input[type="button"]:hover {
     color: #fff;
     border-color: #252525;
     background-color: #252525;

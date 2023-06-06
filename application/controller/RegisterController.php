@@ -71,4 +71,62 @@ class RegisterController extends Controller
     {
         CaptchaModel::generateAndShowCaptcha();
     }
+   
+    public function register_adress()
+    {
+        
+        $user_name = strip_tags(Request::post('username'));
+        $delivery_street = strip_tags(Request::post('delivery-street'));
+        $delivery_housenumber = strip_tags(Request::post('delivery-housenumber'));
+        $delivery_postalcode = Request::post('delivery-postalcode');
+        $delivery_city = Request::post('delivery-city');
+        $pay_type = Request::post('payment-option');
+
+
+        Session::add('ordem_de_compra', array('username'=>$user_name,
+                                             'delivery-street'=>$delivery_street,
+                                             'delivery-housenumber'=>$delivery_housenumber,
+                                              'delivery-postalcode' =>$delivery_postalcode,
+                                              'delivery-city'=>$delivery_city,
+                                              'payment-option'=> $pay_type
+                                            ));
+
+
+
+         $address_number=RegistrationModel::readLastAddress();
+        
+
+        
+         $address_number->last_address = $address_number->last_address == intVal(0) ? intVal(1) :  intVal($address_number->last_address);
+
+        $registration_bool= RegistrationModel::writeNewAdress($address_number->last_address, $delivery_street,  $delivery_housenumber, $delivery_postalcode, $delivery_city, $pay_type );
+        
+
+
+
+
+
+
+        if ($registration_bool) {
+
+            $order_number=RegistrationModel::readLastOrder();
+            
+
+            $order_number->last_order =  $order_number->last_order == intVal(0) ? intVal(1) :  intVal($order_number->last_order);
+            $address_number->last_address = $address_number->last_address == intVal(0) ? intVal(1) :  intVal($address_number->last_address);
+
+            $order_bool=RegistrationModel::writeNewOrder($order_number->last_order,intVal($pay_type),  $address_number->last_address);
+
+            if($order_bool){
+                Redirect::to('order/Detail');
+            }
+            else{
+                Redirect::to('order/index');
+            }
+            
+        } else {
+            Redirect::to('order/index');
+        }
+    }
 }
+

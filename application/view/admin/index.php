@@ -8,6 +8,8 @@
 
         <h3>What happens here ?</h3>
 
+        
+
         <div>
             This controller/action/view shows a list of all users in the system. with the ability to soft delete a user
             or suspend a user.
@@ -24,9 +26,11 @@
                     <td>Link to user's profile</td>
                     <td>suspension Time in days</td>
                     <td>Soft delete</td>
+                    <td>Account Type </td> <!-- Die Spalte für den Account Type -->
                     <td>Submit</td>
                 </tr>
                 </thead>
+
                 <?php foreach ($this->users as $user) { ?>
                     <tr class="<?= ($user->user_active == 0 ? 'inactive' : 'active'); ?>">
                         <td><?= $user->user_id; ?></td>
@@ -44,6 +48,7 @@
                         <form action="<?= config::get("URL"); ?>admin/actionAccountSettings" method="post">
                             <td><input type="number" name="suspension" /></td>
                             <td><input type="checkbox" name="softDelete" <?php if ($user->user_deleted) { ?> checked <?php } ?> /></td>
+                                <?php include 'editUserAccountType.php';?> <!-- Datei der erstellten Tabelle wird inkludiert -->
                             <td>
                                 <input type="hidden" name="user_id" value="<?= $user->user_id; ?>" />
                                 <input type="submit" />

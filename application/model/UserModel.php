@@ -19,7 +19,8 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar, user_deleted FROM users";
+        // user_account_type zur SQL-Abfrage hinzugefügt
+        $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar, user_deleted, user_account_type FROM users";
         $query = $database->prepare($sql);
         $query->execute();
 
@@ -38,6 +39,7 @@ class UserModel
             $all_users_profiles[$user->user_id]->user_email = $user->user_email;
             $all_users_profiles[$user->user_id]->user_active = $user->user_active;
             $all_users_profiles[$user->user_id]->user_deleted = $user->user_deleted;
+            $all_users_profiles[$user->user_id]->user_account_type = $user->user_account_type; //Hinzufügen des user_account_type zum Nutzerprofils
             $all_users_profiles[$user->user_id]->user_avatar_link = (Config::get('USE_GRAVATAR') ? AvatarModel::getGravatarLinkByEmail($user->user_email) : AvatarModel::getPublicAvatarFilePathOfUser($user->user_has_avatar, $user->user_id));
         }
 
@@ -53,7 +55,7 @@ class UserModel
     {
         $database = DatabaseFactory::getFactory()->getConnection();
 
-        $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar, user_deleted
+        $sql = "SELECT user_id, user_name, user_email, user_active, user_has_avatar, user_deleted, user_account_type
                 FROM users WHERE user_id = :user_id LIMIT 1";
         $query = $database->prepare($sql);
         $query->execute(array(':user_id' => $user_id));
@@ -339,5 +341,36 @@ class UserModel
 
         // return one row (we only have one result or nothing)
         return $query->fetch();
+    }
+
+    public static function getAccountType($type_id = null)
+    {
+        //Aufrufen der Datenbankverbindung 
+        $database = DatabaseFactory::getFactory()->getConnection();
+
+        //Das SQL-Statement wird vorbereitet 
+        $query = $database->prepare(
+            "SELECT account_type_name
+             FROM rights_group
+             WHERE account_type_id = :accTypeId"
+        );
+        $query->execute([':accTypeId' => $type_id]);
+
+        return $query->fetch()->account_type_name;
+    }
+
+    public static function getAllAccountTypes()
+    {
+        $database = DatabaseFactory::getFactory()->getConnection();
+
+        $query = $database->prepare(
+            "SELECT *
+             FROM rights_group"
+        );
+        $query->execute();
+
+        $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
+        
     }
 }

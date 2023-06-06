@@ -30,6 +30,7 @@ class Redirect
         header("location: " . Config::get('URL'));
     }
 
+
     /**
      * To the defined page, uses a relative path (like "user/profile")
      *

@@ -114,6 +114,7 @@ class View
         }
 
         return false;
+
     }
 
     /**
@@ -174,4 +175,5 @@ class View
     {
         return htmlentities($str, ENT_QUOTES, 'UTF-8');
     }
+
 }

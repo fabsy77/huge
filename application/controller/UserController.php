@@ -138,6 +138,11 @@ class UserController extends Controller
         $this->View->render('user/changePassword');
     }
 
+    public function add2FA()
+    {
+        $this->View->render('user/2fa');
+    }
+
     /**
      * Password Change Action
      * Submit form, if retured positive redirect to index, otherwise show the changePassword page again

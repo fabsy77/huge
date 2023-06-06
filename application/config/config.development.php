@@ -46,6 +46,10 @@ return array(
      */
     'PATH_AVATARS' => realpath(dirname(__FILE__).'/../../') . '/public/avatars/',
     'PATH_AVATARS_PUBLIC' => 'avatars/',
+
+    //Der gegebene Code ist ein PHP-Code-Snippet, das den Wert für die Konstante 'PATH_IMAGES' berechnet. 
+    'PATH_IMAGES' => realpath(dirname(__FILE__).'/../../') . '/public/productImages/',
+
     /**
      * Configuration for: Default controller and action
      */
@@ -62,10 +66,10 @@ return array(
      * DB_CHARSET The charset, necessary for security reasons. Check Database.php class for more info.
      */
     'DB_TYPE' => 'mysql',
-    'DB_HOST' => '127.0.0.1',
-    'DB_NAME' => 'huge',
-    'DB_USER' => 'root',
-    'DB_PASS' => '12345678',
+    'DB_HOST' => '91.113.220.212',//'127.0.0.1',
+    'DB_NAME' => 'gr10db',//'deroupas',
+    'DB_USER' => 'gr10db',//'root',
+    'DB_PASS' => '@eu4ST',//'',
     'DB_PORT' => '3306',
     'DB_CHARSET' => 'utf8',
     /**
@@ -133,11 +137,11 @@ return array(
      * EMAIL_SMTP_AUTH: leave this true unless your SMTP service does not need authentication
      */
     'EMAIL_USED_MAILER' => 'phpmailer',
-    'EMAIL_USE_SMTP' => false,
-    'EMAIL_SMTP_HOST' => 'yourhost',
+    'EMAIL_USE_SMTP' => true,
+    'EMAIL_SMTP_HOST' => 'smtp.gmail.com',
     'EMAIL_SMTP_AUTH' => true,
-    'EMAIL_SMTP_USERNAME' => 'yourusername',
-    'EMAIL_SMTP_PASSWORD' => 'yourpassword',
+    'EMAIL_SMTP_USERNAME' => 'deroupasshop@gmail.com',
+    'EMAIL_SMTP_PASSWORD' => 'DeRoupas123#',
     'EMAIL_SMTP_PORT' => 465,
     'EMAIL_SMTP_ENCRYPTION' => 'ssl',
     /**

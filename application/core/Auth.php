@@ -39,6 +39,7 @@ class Auth
         }
     }
 
+
     /**
      * The admin authentication flow, just check if the user is logged in (by looking into the session) AND has
      * user role type 7 (currently there's only type 1 (normal user), type 2 (premium user) and 7 (admin)).

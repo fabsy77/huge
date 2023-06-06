@@ -31,4 +31,20 @@ class Controller
         // create a view object to be able to use it inside a controller, like $this->View->render();
         $this->View = new View();
     }
+    //???
+
+    // function to validate every post's field from frontend 
+    //must be inherited in the child controller implict depends on extends Controller you can find it in your controller file
+    public static function IsValidPost($postData){
+
+       // for each field sent in the post array
+       foreach (get_object_vars($postData) as $var => $val) {
+        // if the following field is null , or empty by func or empty by comparing to empty string, it add the feedback message to emitter and return false, otherwise return true
+        if(is_null($val) || empty($val) || $val == ""){
+            Session::add('feedback_negative', Text::get('FEEDBACK_MISSING_DATA_FAILED'));
+            return false;
+        }
+       }
+       return  true;
+    }
 }

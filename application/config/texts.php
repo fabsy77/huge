@@ -70,6 +70,13 @@ return array(
     "FEEDBACK_NOTE_CREATION_FAILED" => "Note creation failed.",
     "FEEDBACK_NOTE_EDITING_FAILED" => "Note editing failed.",
     "FEEDBACK_NOTE_DELETION_FAILED" => "Note deletion failed.",
+    "FEEDBACK_PRODUCT_CREATION_FAILED" => "Product creation failed.",
+    "FEEDBACK_PRODUCT_EDITING_FAILED" => "Product editing failed.",
+    "FEEDBACK_PRODUCT_DELETION_FAILED" => "Product deletion failed.",
+    "FEEDBACK_PRODUCT_CREATION_SUCESSFUL" => "Product creation Sucessfully.",
+    "FEEDBACK_MISSING_DATA_FAILED" => "Some fields was not filled properly.",
     "FEEDBACK_COOKIE_INVALID" => "Your remember-me-cookie is invalid.",
     "FEEDBACK_COOKIE_LOGIN_SUCCESSFUL" => "You were successfully logged in via the remember-me-cookie.",
+    
+
 );

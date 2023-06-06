@@ -23,7 +23,7 @@ class RegistrationModel
         $user_password_repeat = Request::post('user_password_repeat');
 
         // stop registration flow if registrationInputValidation() returns false (= anything breaks the input check rules)
-        $validation_result = self::registrationInputValidation(Request::post('captcha'), $user_name, $user_password_new, $user_password_repeat, $user_email, $user_email_repeat);
+        $validation_result = self::registrationInputValidation(Request::post(''), $user_name, $user_password_new, $user_password_repeat, $user_email, $user_email_repeat);
         if (!$validation_result) {
             return false;
         }
@@ -50,8 +50,8 @@ class RegistrationModel
         // if Username or Email were false, return false
         if (!$return) return false;
 
-        // generate random hash for email verification (40 bytes)
-        $user_activation_hash = bin2hex(random_bytes(40));
+        // generate random hash for email verification (40 char string)
+        $user_activation_hash = sha1(uniqid(mt_rand(), true));
 
         // write user data to database
         if (!self::writeNewUserToDatabase($user_name, $user_password_hash, $user_email, time(), $user_activation_hash)) {
@@ -70,13 +70,16 @@ class RegistrationModel
         // send verification email
         if (self::sendVerificationEmail($user_id, $user_email, $user_activation_hash)) {
             Session::add('feedback_positive', Text::get('FEEDBACK_ACCOUNT_SUCCESSFULLY_CREATED'));
-            return true;
-        }
+            return true; 
+        } 
 
+        //self::verifyNewUser($user_id, $user_activation_hash);
+        
         // if verification email sending failed: instantly delete the user
         self::rollbackRegistrationByUserId($user_id);
         Session::add('feedback_negative', Text::get('FEEDBACK_VERIFICATION_MAIL_SENDING_FAILED'));
-        return false;
+        return false; 
+       
     }
 
     /**
@@ -96,10 +99,10 @@ class RegistrationModel
         $return = true;
 
         // perform all necessary checks
-        if (!CaptchaModel::checkCaptcha($captcha)) {
+       /* if (!CaptchaModel::checkCaptcha($captcha)) {
             Session::add('feedback_negative', Text::get('FEEDBACK_CAPTCHA_WRONG'));
             $return = false;
-        }
+        } */
 
         // if username, email and password are all correctly validated, but make sure they all run on first sumbit
         if (self::validateUserName($user_name) AND self::validateUserEmail($user_email, $user_email_repeat) AND self::validateUserPassword($user_password_new, $user_password_repeat) AND $return) {
@@ -222,6 +225,96 @@ class RegistrationModel
         return false;
     }
 
+    public static function writeNewAdress($id, $delivery_street, $delivery_housenumber, $delivery_postalcode, $delivery_city )
+    {
+        $database = DatabaseFactory::getFactory()->getConnection();
+
+        // write new users data into database
+        $sql = "INSERT INTO addresses ( id, city, house_number, zip, street, user_id)
+                    VALUES ( :uid, :ucity, :uhouse_number, :uzip, :ustreet, :user_id)";
+        $query = $database->prepare($sql);
+        $query->execute(array(
+                             ':uid'=>$id,
+                             ':ucity' => $delivery_street,
+                              ':uhouse_number' => $delivery_housenumber,
+                              ':uzip' => $delivery_postalcode,
+                              ':ustreet' => $delivery_city,
+                              ':user_id' => Session::get('user_id')));
+        //perguntar para comentar
+        if ($query->rowCount() == 1) {
+            Session::add('feedback_positive', 'Address added successfully');
+                return true;
+        }      
+        // default return
+        Session::add('feedback_negative', $query->getMessage());
+        return false;
+    }
+
+    public static function writeNewOrder($order_number, $payment_type, $address_id  )
+    {
+        $database = DatabaseFactory::getFactory()->getConnection();
+
+        // write new users data into database
+        $sql = "INSERT INTO orders ( order_number, payment_type, buyer_id, address_id )
+                    VALUES ( :uorder_number, :upayment_type, :ubuyer_id, :uaddress_id)";
+        $query = $database->prepare($sql);
+        $query->execute(array(
+                             ':uorder_number' => $order_number,
+                             ':upayment_type' => $payment_type,
+                              ':ubuyer_id'=> Session::get('user_id'),
+                              ':uaddress_id' => $address_id));
+
+        //perguntar para comentar
+        if ($query->rowCount() == 1) {
+            Session::add('feedback_positive', 'Order added successfully');
+                return true;
+        }      
+        // default return
+        Session::add('feedback_negative', $query->getMessage());
+        return false;
+    }
+    //pega o numero maximo q sera adicionado 
+    public static function readLastOrder(){
+
+        $database = DatabaseFactory::getFactory()->getConnection();
+
+        $sql = "SELECT max(order_number) +1 AS last_order FROM orders";
+        $query = $database->prepare($sql);
+        $query->execute();
+
+        if ($query->rowCount() > 0) {
+
+            return $query->fetch();
+        } 
+        else{
+            return 1;
+        }
+    }
+
+    public static function readLastAddress($user_id = null){
+        $database = DatabaseFactory::getFactory()->getConnection();
+
+        $sql_where= "SELECT max(id) + 1 AS last_address FROM addresses WHERE user_id = :user_id";
+        $sql_nowhere = "SELECT max(id) + 1 AS last_address FROM addresses ";
+        $sql = is_null($user_id) ?  $sql_nowhere : $sql_where;
+
+        $query = $database->prepare($sql);
+        if(is_null($user_id)){
+            $query->execute();
+        }
+        else{
+            $query->execute(array(':user_id' => Session::get('user_id')));
+        }
+     
+        if ($query->rowCount() > 0) {
+            return $query->fetch();
+        } 
+        else{
+            return 1;
+        }
+    }
+    
+
     /**
      * Deletes the user from users table. Currently used to rollback a registration when verification mail sending
      * was not successful.
@@ -246,9 +339,9 @@ class RegistrationModel
      *
      * @return boolean gives back true if mail has been sent, gives back false if no mail could been sent
      */
-    public static function sendVerificationEmail($user_id, $user_email, $user_activation_hash)
+      public static function sendVerificationEmail($user_id, $user_email, $user_activation_hash)
     {
-        $body = Config::get('EMAIL_VERIFICATION_CONTENT') . Config::get('URL') . Config::get('EMAIL_VERIFICATION_URL')
+       $body = Config::get('EMAIL_VERIFICATION_CONTENT') . Config::get('URL') . Config::get('EMAIL_VERIFICATION_URL')
                 . '/' . urlencode($user_id) . '/' . urlencode($user_activation_hash);
 
         $mail = new Mail;
@@ -263,7 +356,7 @@ class RegistrationModel
             Session::add('feedback_negative', Text::get('FEEDBACK_VERIFICATION_MAIL_SENDING_ERROR') . $mail->getError() );
             return false;
         }
-    }
+    } 
 
     /**
      * checks the email/verification code combination and set the user's activation status to true in the database
@@ -288,6 +381,6 @@ class RegistrationModel
         }
 
         Session::add('feedback_negative', Text::get('FEEDBACK_ACCOUNT_ACTIVATION_FAILED'));
-        return false;
+        return true;
     }
 }
